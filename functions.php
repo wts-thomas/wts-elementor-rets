@@ -6,7 +6,7 @@ require 'plugin-update-checker/plugin-update-checker.php';
 $myUpdateChecker = Puc_v4_Factory::buildUpdateChecker(
 	'https://github.com/wts-thomas/wts-elementor-rets/',
 	__FILE__,
-	'wts-elementor'
+	'wts-elementor-rets'
 );
 
 //Set the branch that contains the stable release.
@@ -627,11 +627,6 @@ function page_breadcrumbs() {
    }     
 }
 add_shortcode('breadcrumbs', 'page_breadcrumbs');
-
-
-/*  LAZY LOAD
-________________________________________________________________________*/
-
 
 
 /* THIS IS THE END                                                       */
