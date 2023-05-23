@@ -84,5 +84,9 @@
    --e-p-border-widget-invert: #0c0d0e;
    --e-p-border-global: #5eead4;
    --e-p-border-global-hover: #1dddbf;
-   --e-p-border-global-invert:#0c0d0e;
+   --e-p-border-global-invert: #0c0d0e;
+}
+
+#elementor-panel-page-editor .e-ai-button {
+   display: none !important;
 }
