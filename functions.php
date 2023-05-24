@@ -671,6 +671,20 @@ add_action('admin_init', 'add_elementor_checkbox');
 add_action('admin_head-post.php', 'hide_elementor_button');
 add_action('admin_head-post-new.php', 'hide_elementor_button');
 
+/*  RETS/MLS PLUGIN - ESTATIK
+________________________________________________________________________*/
+
+// Adds a space after commas
+function add_spaces_after_commas_in_estatik_fields($content) {
+   if (is_singular() && in_array('single-properties', get_body_class())) {
+       $pattern = '/(?<=,)(?=[^\s])/'; // Regex pattern to match commas without spaces after them
+       $replacement = ' '; // Replacement string with space after the comma
+       $content = preg_replace($pattern, $replacement, $content);
+   }
+   return $content;
+}
+add_filter('the_content', 'add_spaces_after_commas_in_estatik_fields', 9999);
+
 /* THIS IS THE END                                                       */
 /* --------------------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
