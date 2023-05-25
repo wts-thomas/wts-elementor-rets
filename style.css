@@ -4,7 +4,7 @@ Theme URI: https://wtsks.com
 Author: WTS
 Author URI: https://wtsks.com
 Description: A plain-vanilla & lightweight theme for Elementor page builder used with RETS
-Version: 1.1.1
+Version: 1.1.2
 Requires at least: 5.2
 Tested up to: 6.1
 Requires PHP: 8.0
@@ -317,6 +317,21 @@ ul.breadcrumbs li.separator {
 }
 ul.breadcrumbs .item-current {
 	color: var(--e-global-color-primary);
+}
+
+/* ------------------------------------------------------------
+	ESTATIK
+/* ------------------------------------------------------------ */
+
+.es-property_section--agent-contact-information {
+   background-color: #efefef;
+   border-radius: 6px;
+}
+.es-property_section--agent-contact-information .es-property-section__title {
+   display: none;
+}
+.es-property_section--agent-contact-information .es-property-section__content {
+   padding: 20px 100px !important;
 }
 
 

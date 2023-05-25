@@ -674,6 +674,24 @@ add_action('admin_head-post-new.php', 'hide_elementor_button');
 /*  RETS/MLS PLUGIN - ESTATIK
 ________________________________________________________________________*/
 
+// Formats MLS phone numbers
+function convert_phone_number_format($content) {
+   if (is_singular() && in_array('single-properties', get_body_class())) {
+       // Regular expression pattern to match phone number in format "123-456-7890"
+       $pattern = '/(\d{3})-(\d{3})-(\d{4})/';
+
+       // Replacement pattern for the desired format "(123) 456-7890"
+       $replacement = '($1) $2-$3';
+
+       // Convert phone numbers to desired format
+       $content = preg_replace($pattern, $replacement, $content);
+   }
+
+   return $content;
+}
+add_filter('the_content', 'convert_phone_number_format', 9999);
+
+
 // Adds a space after commas
 function add_spaces_after_commas_in_estatik_fields($content) {
    if (is_singular() && in_array('single-properties', get_body_class())) {
@@ -684,6 +702,29 @@ function add_spaces_after_commas_in_estatik_fields($content) {
    return $content;
 }
 add_filter('the_content', 'add_spaces_after_commas_in_estatik_fields', 9999);
+
+
+// Removes commas from Agent Contact name field when named "list-agent"
+// If at any point the field name changes, that class name needs updated
+function remove_commas_from_estatik_fields($content) {
+   if (is_singular() && in_array('single-properties', get_body_class())) {
+       $pattern = '/,/';
+       $replacement = ''; // Empty string to remove the comma
+       $dom = new DOMDocument();
+       $dom->loadHTML($content);
+       $xpath = new DOMXPath($dom);
+       $elements = $xpath->query("//li[contains(@class, 'es-entity-field--list-agent')]/span[contains(@class, 'es-property-field__value')]");
+       foreach ($elements as $element) {
+           $text = $element->nodeValue;
+           $modifiedText = preg_replace($pattern, $replacement, $text);
+           $element->nodeValue = $modifiedText;
+       }
+       $content = $dom->saveHTML();
+   }
+   return $content;
+}
+add_filter('the_content', 'remove_commas_from_estatik_fields', 9999);
+
 
 /* THIS IS THE END                                                       */
 /* --------------------------------------------------------------------- */
