@@ -693,11 +693,27 @@ add_filter('the_content', 'convert_phone_number_format', 9999);
 
 
 // Adds a space after commas
+// This is necessary because the sting from MLS does not have spaces after commas
 function add_spaces_after_commas_in_estatik_fields($content) {
    if (is_singular() && in_array('single-properties', get_body_class())) {
-       $pattern = '/(?<=,)(?=[^\s])/'; // Regex pattern to match commas without spaces after them
-       $replacement = ' '; // Replacement string with space after the comma
-       $content = preg_replace($pattern, $replacement, $content);
+       $dom = new DOMDocument();
+       libxml_use_internal_errors(true); // Suppress HTML parsing errors
+       $dom->loadHTML($content, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+       $xpath = new DOMXPath($dom);
+
+       $divs = $xpath->query("//div[contains(@class, 'es-property_section--building-details') or contains(@class, 'es-property_section--features')]");
+
+       foreach ($divs as $div) {
+           // Find span elements with class "es-property-field__value" within the div specified above
+           $spanElements = $xpath->query(".//span[contains(@class, 'es-property-field__value')]", $div);
+
+           foreach ($spanElements as $span) {
+               $text = $span->textContent;
+               $text = preg_replace('/(?<=,)(?=[^\s])/', ' ', $text);
+               $span->textContent = $text;
+           }
+       }
+       $content = $dom->saveHTML();
    }
    return $content;
 }
