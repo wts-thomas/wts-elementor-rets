@@ -742,6 +742,28 @@ function remove_commas_from_estatik_fields($content) {
 add_filter('the_content', 'remove_commas_from_estatik_fields', 9999);
 
 
+// Converts UPPERCASE to Title Case for the builders div
+function convert_to_title_case($content) {
+   if (is_singular() && in_array('single-properties', get_body_class())) {
+       $pattern = '/\b\w+\b/';
+       $dom = new DOMDocument();
+       $dom->loadHTML($content);
+       $xpath = new DOMXPath($dom);
+       $elements = $xpath->query("//li[contains(@class, 'es-entity-field--builder')]/span[contains(@class, 'es-property-field__value')]");
+       foreach ($elements as $element) {
+           $text = $element->nodeValue;
+           $modifiedText = preg_replace_callback($pattern, function ($matches) {
+               return ucwords(strtolower($matches[0]));
+           }, $text);
+           $element->nodeValue = $modifiedText;
+       }
+       $content = $dom->saveHTML();
+   }
+   return $content;
+}
+add_filter('the_content', 'convert_to_title_case', 9999);
+
+
 /* THIS IS THE END                                                       */
 /* --------------------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
