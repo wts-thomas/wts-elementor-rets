@@ -742,14 +742,14 @@ function remove_commas_from_estatik_fields($content) {
 add_filter('the_content', 'remove_commas_from_estatik_fields', 9999);
 
 
-// Converts UPPERCASE to Title Case for the builders div
+// Converts UPPERCASE to Title Case for the builders and community div
 function convert_to_title_case($content) {
    if (is_singular() && in_array('single-properties', get_body_class())) {
        $pattern = '/\b\w+\b/';
        $dom = new DOMDocument();
        $dom->loadHTML($content);
        $xpath = new DOMXPath($dom);
-       $elements = $xpath->query("//li[contains(@class, 'es-entity-field--builder')]/span[contains(@class, 'es-property-field__value')]");
+       $elements = $xpath->query("//li[contains(@class, 'es-entity-field--builder') or contains(@class, 'es-entity-field--subdivision')]/span[contains(@class, 'es-property-field__value')]");
        foreach ($elements as $element) {
            $text = $element->nodeValue;
            $modifiedText = preg_replace_callback($pattern, function ($matches) {
