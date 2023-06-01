@@ -4,7 +4,7 @@ Contributors: Thomas Rainer
 Requires at least: 4.7
 Tested up to: 6.1
 Stable tag: 1.0
-Version: 1.1.6
+Version: 1.1.7
 Requires PHP: 8.0
 JQuery: 3.6.3
 License: GNU General Public License v3 or later
@@ -19,9 +19,13 @@ This theme resets the WordPress environment and prepares it for smooth operation
 
 Screenshot's images & icons are licensed under: Creative Commons (CC0), https://creativecommons.org/publicdomain/zero/1.0/legalcode
 
+= 1.1.7 - 06-01-2023 =
+* Additional styles added to cancel scroll zoom for google maps from Estatik on property pages
+* Additional styles added to hide google map elements, except zoom, on property pages
+
 = 1.1.6 - 06-01-2023 =
 * Styles added to cancel scroll zoom for google maps from Estatik
-* Styles added to hide some google map terrain and ability to place google person
+* Styles added to hide google map elements, except zoom, on property pages
 
 = 1.1.5 - 05-27-2023 =
 * Altered function changing all cap to title case to include communities/subdivisions
