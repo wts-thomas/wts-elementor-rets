@@ -4,7 +4,7 @@ Contributors: Thomas Rainer
 Requires at least: 4.7
 Tested up to: 6.1
 Stable tag: 1.0
-Version: 1.1.8
+Version: 1.2.0
 Requires PHP: 8.0
 JQuery: 3.6.3
 License: GNU General Public License v3 or later
@@ -18,6 +18,11 @@ A basic, plain-vanilla, lightweight theme, best suited for building your site us
 This theme resets the WordPress environment and prepares it for smooth operation of Elementor.
 
 Screenshot's images & icons are licensed under: Creative Commons (CC0), https://creativecommons.org/publicdomain/zero/1.0/legalcode
+
+= 1.2.0 - 06-09-2023 =
+* Various adjustments to global styles
+* Bold headings for property descriptions
+* Function to add MLS Status Terms to Property Listings
 
 = 1.1.8 - 06-06-2023 =
 * Dashboard Overrides for Elementor AI buttons

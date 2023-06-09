@@ -764,6 +764,25 @@ function convert_to_title_case($content) {
 add_filter('the_content', 'convert_to_title_case', 9999);
 
 
+// Gets the Status Terms from MLS and adds them to the listings
+// Shows the term "Pending" instead of "Active" and "Pending"
+function es312_property_badges_terms( $terms, $post_id ) {
+	$terms = empty( $terms ) ? array() : $terms;
+	$statuses = get_the_terms( $post_id, 'es_status' );
+
+	if ( ! empty( $statuses ) ) {
+		foreach ( $statuses as $status ) {
+			if ( $status->name === 'Pending' ) {
+				$terms[] = $status;
+			}
+		}
+	}
+
+	return $terms;
+}
+add_filter( 'es_property_badges_terms', 'es312_property_badges_terms', 10, 2 );
+
+
 /* THIS IS THE END                                                       */
 /* --------------------------------------------------------------------- */
 /* --------------------------------------------------------------------- */
