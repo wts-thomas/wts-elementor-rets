@@ -238,6 +238,7 @@ function add_theme_enqueues() {
 	wp_enqueue_script( 'jquery', 'https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js', array(), '3.6.3', false);
 	wp_enqueue_script( 'viewportHeight', get_template_directory_uri() . '/js/viewportHeight.js#asyncload', array ( 'jquery' ), 1, true);
    wp_enqueue_script( 'responsiveTables', get_template_directory_uri() . '/js/responsiveTables.js#asyncload', array ( 'jquery' ), 1, true);
+   wp_enqueue_script( 'propertyListings-functions', get_template_directory_uri() . '/js/propertyListings-functions.js#asyncload', array ( 'jquery' ), 1, true);
    wp_enqueue_script( 'jquery.matchHeight', get_template_directory_uri() . '/js/jquery.matchHeight.js#asyncload', array ( 'jquery' ), 1, false);
 }
 add_action( 'wp_enqueue_scripts', 'add_theme_enqueues' );
@@ -693,7 +694,9 @@ add_filter('the_content', 'convert_phone_number_format', 9999);
 
 
 // Adds a space after commas
-// This is necessary because the sting from MLS does not have spaces after commas
+// Does not add a space if there is already a space
+// Does not add a space if the text is formatted like currency
+// This is necessary because the string from MLS does not have spaces after commas
 function add_spaces_after_commas_in_estatik_fields($content) {
    if (is_singular() && in_array('single-properties', get_body_class())) {
        $dom = new DOMDocument();
@@ -701,7 +704,7 @@ function add_spaces_after_commas_in_estatik_fields($content) {
        $dom->loadHTML($content, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
        $xpath = new DOMXPath($dom);
 
-       $divs = $xpath->query("//div[contains(@class, 'es-property_section--building-details') or contains(@class, 'es-property_section--features')]");
+       $divs = $xpath->query("//div[contains(@class, 'es-property_section')]");
 
        foreach ($divs as $div) {
            // Find span elements with class "es-property-field__value" within the div specified above
@@ -709,7 +712,16 @@ function add_spaces_after_commas_in_estatik_fields($content) {
 
            foreach ($spanElements as $span) {
                $text = $span->textContent;
-               $text = preg_replace('/(?<=,)(?=[^\s])/', ' ', $text);
+
+               // Regular expression pattern to match currency formatting
+               $currencyPattern = '/\$\d{1,3}(,\d{3})*(\.\d+)?/';
+
+               // Check if the text matches the currency pattern
+               if (!preg_match($currencyPattern, $text)) {
+                   $text = str_replace(', ', ',', $text);
+                   $text = str_replace(',', ', ', $text);
+               }
+
                $span->textContent = $text;
            }
        }
@@ -718,6 +730,61 @@ function add_spaces_after_commas_in_estatik_fields($content) {
    return $content;
 }
 add_filter('the_content', 'add_spaces_after_commas_in_estatik_fields', 9999);
+
+
+// Adds commas to specified number strings such as sq ft and lot size
+function add_commas_to_estatik_fields($content) {
+   if (is_singular() && in_array('single-properties', get_body_class())) {
+       $pattern = '/\d{1,3}(?=(\d{3})+(?!\d))/';
+       $replacement = '$0,';
+       $dom = new DOMDocument();
+       $dom->loadHTML($content);
+       $xpath = new DOMXPath($dom);
+       
+       // Query for 'es-property-field--area'
+       $elements = $xpath->query("//li[contains(@class, 'es-property-field--area')]/span[contains(@class, 'es-property-field__value')]");
+       foreach ($elements as $element) {
+           $text = $element->nodeValue;
+           $modifiedText = preg_replace($pattern, $replacement, $text);
+           $element->nodeValue = $modifiedText;
+       }
+
+       // Query for 'es-entity-field--lot_size'
+       $elements = $xpath->query("//li[contains(@class, 'es-entity-field--lot_size')]/span[contains(@class, 'es-property-field__value')]");
+       foreach ($elements as $element) {
+           $text = $element->nodeValue;
+           $modifiedText = preg_replace($pattern, $replacement, $text);
+           $element->nodeValue = $modifiedText;
+       }
+       
+       $content = $dom->saveHTML();
+   }
+   return $content;
+}
+add_filter('the_content', 'add_commas_to_estatik_fields', 9999);
+
+
+// Adds a comma to the sq ft top meta field on single property pages
+// function add_commas_to_estatik_meta_fields($content) {
+//    if (is_singular() && in_array('single-properties', get_body_class())) {
+//        $pattern = '/\d{1,3}(?=(\d{3})+(?!\d))/';
+//        $replacement = '$0,';
+//        $dom = new DOMDocument();
+//        $dom->loadHTML($content);
+//        $xpath = new DOMXPath($dom);
+//        $elements = $xpath->query("//ul[contains(@class, 'es-listing__meta')]//li[contains(@class, 'es-listing__meta-area')]");
+//        foreach ($elements as $element) {
+//            $span = $element->getElementsByTagName('span')->item(0);
+//            $b = $span->getElementsByTagName('b')->item(0);
+//            $text = $b->nodeValue;
+//            $modifiedText = preg_replace($pattern, $replacement, $text);
+//            $b->nodeValue = $modifiedText;
+//        }
+//        $content = $dom->saveHTML();
+//    }
+//    return $content;
+// }
+// add_filter('the_content', 'add_commas_to_estatik_meta_fields', 9999);
 
 
 // Removes commas from Agent Contact name field when named "list-agent"

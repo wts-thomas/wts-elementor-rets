@@ -4,7 +4,7 @@ Contributors: Thomas Rainer
 Requires at least: 4.7
 Tested up to: 6.1
 Stable tag: 1.0
-Version: 1.2.1
+Version: 1.2.3
 Requires PHP: 8.0
 JQuery: 3.6.3
 License: GNU General Public License v3 or later
@@ -18,6 +18,15 @@ A basic, plain-vanilla, lightweight theme, best suited for building your site us
 This theme resets the WordPress environment and prepares it for smooth operation of Elementor.
 
 Screenshot's images & icons are licensed under: Creative Commons (CC0), https://creativecommons.org/publicdomain/zero/1.0/legalcode
+
+= 1.2.3 - 07-13-2023 =
+* Refactored function that adds commas to be more inclusive when/if field builder names change
+* Refactored function to not add a space if the text is formatted like currency
+* Function that adds commas to specified number strings such as sq ft etc and to lot size
+* Adds a comma to the sq ft meta field
+
+= 1.2.2 - 06-09-2023 =
+* Additional style adjustments for Status Badges
 
 = 1.2.1 - 06-09-2023 =
 * Style adjustments for Status Badges
