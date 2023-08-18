@@ -4,7 +4,7 @@ Contributors: Thomas Rainer
 Requires at least: 4.7
 Tested up to: 6.1
 Stable tag: 1.0
-Version: 1.2.5
+Version: 1.2.8
 Requires PHP: 8.0
 JQuery: 3.6.3
 License: GNU General Public License v3 or later
@@ -18,6 +18,16 @@ A basic, plain-vanilla, lightweight theme, best suited for building your site us
 This theme resets the WordPress environment and prepares it for smooth operation of Elementor.
 
 Screenshot's images & icons are licensed under: Creative Commons (CC0), https://creativecommons.org/publicdomain/zero/1.0/legalcode
+
+= 1.2.8 - 08-18-2023 =
+* Removes the function "Explicit Fix to Width and Height" due to an occational Critical error
+
+= 1.2.7 - 08-09-2023 =
+* Deregisters Dashicons for non logged in users
+
+= 1.2.6 - 08-07-2023 =
+* Function to cancel revisions within WordPress
+* CSS Pointer Event for passthrough on divs
 
 = 1.2.5 - 07-25-2023 =
 * Adds the excerpt meta box for pages
