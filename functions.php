@@ -77,26 +77,6 @@ function remove_jquery_migrate( $scripts ) {
  }
 add_action( 'wp_default_scripts', 'remove_jquery_migrate' );
 
-
-// CANCELS REVISIONS WITHIN WORDPRESS
-// CANCELING TO SAVE SPACE WITHIN THE DATABASE
-function disable_post_revisions() {
-   if (!defined('WP_POST_REVISIONS')) {
-       define('WP_POST_REVISIONS', false);
-   }
-}
-add_action('init', 'disable_post_revisions');
-
-
-// DEREGISTERS DASHICONS FOR NON LOGGED IN USERS
-add_action( 'wp_print_styles', 'wtsrets_dequeue_styles' );
-function wtsrets_dequeue_styles() { 
-    if ( ! is_user_logged_in() ) {
-        wp_dequeue_style( 'dashicons' );
-        wp_deregister_style( 'dashicons' );
-    }
-}
-
 /*  Elementor Edits
 ________________________________________________________________________*/
 
