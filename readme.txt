@@ -19,6 +19,9 @@ This theme resets the WordPress environment and prepares it for smooth operation
 
 Screenshot's images & icons are licensed under: Creative Commons (CC0), https://creativecommons.org/publicdomain/zero/1.0/legalcode
 
+= 1.3.1 - 08-21-2023 =
+* Updated and fixed functions for site optimizations: Dashicons, JS and CSS defering/render blocking resources
+
 = 1.3.0 - 08-21-2023 =
 * CRITICAL ERROR FIX, removed functions: Width and Hight, Deregistration of Dashicons, and Canceling Revisions
 

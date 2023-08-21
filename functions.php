@@ -77,6 +77,39 @@ function remove_jquery_migrate( $scripts ) {
  }
 add_action( 'wp_default_scripts', 'remove_jquery_migrate' );
 
+// REMOVES DASHICONS FOR NON-LOGGEDIN USERS
+add_action( 'wp_print_styles', 'wtsrets_dequeue_styles' );
+function wtsrets_dequeue_styles() { 
+    if ( ! is_user_logged_in() ) {
+        wp_dequeue_style( 'dashicons' );
+        wp_deregister_style( 'dashicons' );
+    }
+}
+
+// DEFERES CSS
+function defer_specific_css_files( $html, $handle ) {
+   $defer_handles = array( 'es-frontend', 'es-select2', 'font-awesome', 'swiper' );
+   
+       if ( in_array( $handle, $defer_handles ) ) {
+           return str_replace( "rel='stylesheet'", "rel='preload' as='style' onload=\"this.onload=null;this.rel='stylesheet'\"", $html );
+       }
+   
+       return $html;
+   }
+   add_filter( 'style_loader_tag', 'defer_specific_css_files', 10, 2 );
+
+// DEFER JS
+function defer_specific_js_files( $tag, $handle ) {
+	$defer_handles = array( 'es-select2', 'es-datetime-picker' );
+
+    if ( in_array( $handle, $defer_handles ) ) {
+        return str_replace( ' src', ' defer src', $tag );
+    }
+
+    return $tag;
+}
+add_filter( 'script_loader_tag', 'defer_specific_js_files', 10, 2 );
+
 /*  Elementor Edits
 ________________________________________________________________________*/
 
