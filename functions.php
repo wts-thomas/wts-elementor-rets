@@ -396,6 +396,25 @@ add_filter( 'gform_confirmation_anchor', '__return_true' );
 // Hides top labels if Placeholders are added - dropdown option
 add_filter( 'gform_enable_field_label_visibility_settings', '__return_true' );
 
+// Blocks non-alphanumeric characters in name fields
+function gf_validate_name( $result, $value, $form, $field ) {
+	if ( $field->type != 'name' ) {
+		return $result;
+	}
+	GFCommon::log_debug( __METHOD__ . '(): Name values => ' . print_r( $value, true ) );
+
+	if ( $result['is_valid'] ) {
+		foreach ( $value as $input ) {
+			if ( ! empty ( $input ) && ! preg_match( '/^[\p{L} ]+$/u', $input ) ) {
+				$result['is_valid'] = false;
+				$result['message'] = '';
+			}
+		}
+	}
+	return $result;
+}
+add_filter( 'gform_field_validation', 'gf_validate_name', 10, 4 );
+
 /*  ACF FIELD - FUNCTIONS
 ________________________________________________________________________*/
 

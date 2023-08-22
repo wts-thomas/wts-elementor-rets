@@ -12,6 +12,11 @@ if ( empty( $ignore_wrapper ) ) : ?>
         <div class="es-listing__content">
             <div class="es-listing__content__inner">
                 <div class="es-listing__content__left">
+                     <?php if( get_field('poh_listing-entry-number') ): ?>
+                        <div class="poh_entry-container">
+                           <strong><?php the_field('poh_listing-entry-number'); ?></strong>
+                        </div>
+                     <?php endif; ?>
                     <?php es_the_title( '<h3 class="es-listing__title">
                         <a href="' . es_get_the_permalink() . '" ' . $target_blank . '>', '</a></h3>' ); ?>
                     <div class='es-badges es-listing--hide-on-list'>
