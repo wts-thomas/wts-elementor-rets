@@ -110,6 +110,7 @@ function defer_specific_js_files( $tag, $handle ) {
 }
 add_filter( 'script_loader_tag', 'defer_specific_js_files', 10, 2 );
 
+
 /*  Elementor Edits
 ________________________________________________________________________*/
 
@@ -234,9 +235,8 @@ function site_async_scripts($url)
     }
 add_filter( 'clean_url', 'site_async_scripts', 11, 1 );
 
+
 // add "#asyncload" to the end of the js file name. I.E. nameoffile-morename.js#asyncload
-
-
 /*  LOAD THEME STYLES AND SCRIPTS
 ________________________________________________________________________*/
 
@@ -266,7 +266,8 @@ add_filter( 'clean_url', function( $url )
 
 /*  SVG IMAGES
 ________________________________________________________________________*/
-	
+// NOTE: SVG width and height functions are not required since we're using Elementor and its' SVG upload to media library functions.
+
 /*  Allows the use of SVGs
 	to be uploaded to the Media Library
 __________________________________________*/
@@ -278,8 +279,6 @@ function cc_mime_types($mimes) {
   return $mimes;
 }
 add_filter('upload_mimes', 'cc_mime_types');
-
-// NOTE: SVG width and height functions are not required since we're using Elementor and its' SVG upload to media library functions.
 
 
 /*  LOADS ELEMENTOR TO TEMPLATE PAGES
@@ -368,6 +367,7 @@ function my_widget_title($t)
 /*  PLUGIN EDITS
 ________________________________________________________________________*/
 
+
 /*  Yoast
 __________________________________________*/
 
@@ -380,11 +380,13 @@ function yoasttobottom() {
 }
 add_filter( 'wpseo_metabox_prio', 'yoasttobottom');
 
+
 /*  Tablepress
 __________________________________________*/
 
 // Removes the Tablepress Admin links on site
 add_filter( 'tablepress_edit_link_below_table', '__return_false' );
+
 
 /*  GRAVITY FORMS
 __________________________________________*/
@@ -415,6 +417,7 @@ function gf_validate_name( $result, $value, $form, $field ) {
 }
 add_filter( 'gform_field_validation', 'gf_validate_name', 10, 4 );
 
+
 /*  ACF FIELD - FUNCTIONS
 ________________________________________________________________________*/
 
@@ -434,6 +437,208 @@ function acf_number_comma_decimal($value, $post_id, $field) {
   $value = number_format(floatval($value), 2);
   return $value;
 }
+
+
+/*  HIDE, EDIT WITH ELEMENTOR BUTTON(S)
+________________________________________________________________________*/
+
+function add_elementor_checkbox() {
+   // Add a new setting to the "General" WordPress settings page
+   add_settings_field(
+       'show_edit_with_elementor_button',
+       'Hide "Edit with Elementor"',
+       'render_elementor_checkbox',
+       'general'
+   );
+   
+   // Register the new setting
+   register_setting('general', 'show_edit_with_elementor_button');
+}
+
+function render_elementor_checkbox() {
+   // Retrieve the current value of the setting
+   $show_button = get_option('show_edit_with_elementor_button');
+   ?>
+   <input type="checkbox" name="show_edit_with_elementor_button" value="1" <?php checked(1, $show_button); ?>>
+   <?php
+}
+
+function hide_elementor_button() {
+   // Check if the "Show 'Edit with Elementor' button" setting is checked
+   $show_button = get_option('show_edit_with_elementor_button');
+   if ($show_button) {
+       // Hide the "Edit with Elementor" button on the post/page edit screen
+       ?>
+       <style>
+            #elementor-switch-mode-button, #elementor-editor, #wp-admin-bar-elementor_edit_page {
+                display:none;
+            } 
+      </style>
+      <?php
+   }
+}
+
+add_action('admin_init', 'add_elementor_checkbox');
+add_action('admin_head-post.php', 'hide_elementor_button');
+add_action('admin_head-post-new.php', 'hide_elementor_button');
+
+
+/*  RETS/MLS PLUGIN - ESTATIK
+________________________________________________________________________*/
+
+// Formats MLS phone numbers
+function convert_phone_number_format($content) {
+   if (is_singular() && in_array('single-properties', get_body_class())) {
+       // Regular expression pattern to match phone number in format "123-456-7890"
+       $pattern = '/(\d{3})-(\d{3})-(\d{4})/';
+
+       // Replacement pattern for the desired format "(123) 456-7890"
+       $replacement = '($1) $2-$3';
+
+       // Convert phone numbers to desired format
+       $content = preg_replace($pattern, $replacement, $content);
+   }
+
+   return $content;
+}
+add_filter('the_content', 'convert_phone_number_format', 9999);
+
+
+libxml_use_internal_errors(true); // Suppress HTML parsing warnings globally for the following functions
+
+function load_content_into_dom($content) {
+    $dom = new DOMDocument();
+    $dom->loadHTML(mb_convert_encoding($content, 'HTML-ENTITIES', 'UTF-8'), LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+    return $dom;
+}
+
+// Adds commas to specified number strings such as sq ft and lot size
+function add_commas_to_estatik_fields($content) {
+   if (is_singular() && in_array('single-properties', get_body_class())) {
+       $pattern = '/\d{1,3}(?=(\d{3})+(?!\d))/';
+       $replacement = '$0,';
+       $dom = load_content_into_dom($content);
+       $xpath = new DOMXPath($dom);
+       
+       // Query for 'es-property-field--area'
+       $elements = $xpath->query("//li[contains(@class, 'es-property-field--area')]/span[contains(@class, 'es-property-field__value')]");
+       foreach ($elements as $element) {
+           $text = $element->nodeValue;
+           $modifiedText = preg_replace($pattern, $replacement, $text);
+           $element->nodeValue = $modifiedText;
+       }
+
+       // Query for 'es-entity-field--lot_size'
+       $elements = $xpath->query("//li[contains(@class, 'es-entity-field--lot_size')]/span[contains(@class, 'es-property-field__value')]");
+       foreach ($elements as $element) {
+           $text = $element->nodeValue;
+           $modifiedText = preg_replace($pattern, $replacement, $text);
+           $element->nodeValue = $modifiedText;
+       }
+       
+       $content = $dom->saveHTML();
+   }
+   return $content;
+}
+add_filter('the_content', 'add_commas_to_estatik_fields', 9999);
+
+
+// Removes commas from Agent Contact name field when named "list-agent"
+// If at any point the field name changes, that class name needs updated
+function remove_commas_from_estatik_fields($content) {
+   if (is_singular() && in_array('single-properties', get_body_class())) {
+       $pattern = '/,/';
+       $replacement = '';
+       $dom = load_content_into_dom($content);
+       $xpath = new DOMXPath($dom);
+       $elements = $xpath->query("//li[contains(@class, 'es-entity-field--list-agent')]/span[contains(@class, 'es-property-field__value')]");
+       foreach ($elements as $element) {
+           $text = $element->nodeValue;
+           $modifiedText = preg_replace($pattern, $replacement, $text);
+           $element->nodeValue = $modifiedText;
+       }
+       $content = $dom->saveHTML();
+   }
+   return $content;
+}
+add_filter('the_content', 'remove_commas_from_estatik_fields', 9999);
+
+
+// Converts UPPERCASE to Title Case for the builders and community div
+function convert_to_title_case($content) {
+   if (is_singular() && in_array('single-properties', get_body_class())) {
+       $pattern = '/\b\w+\b/';
+       $dom = load_content_into_dom($content);
+       $xpath = new DOMXPath($dom);
+       $elements = $xpath->query("//li[contains(@class, 'es-entity-field--builder') or contains(@class, 'es-entity-field--subdivision')]/span[contains(@class, 'es-property-field__value')]");
+       foreach ($elements as $element) {
+           $text = $element->nodeValue;
+           $modifiedText = preg_replace_callback($pattern, function ($matches) {
+               return ucwords(strtolower($matches[0]));
+           }, $text);
+           $element->nodeValue = $modifiedText;
+       }
+       $content = $dom->saveHTML();
+   }
+   return $content;
+}
+add_filter('the_content', 'convert_to_title_case', 9999);
+
+
+// Gets the Status Terms from MLS and adds them to the listings
+// Shows the desired terms
+function es312_property_badges_terms( $terms, $post_id ) {
+	$terms = empty( $terms ) ? array() : $terms;
+	$statuses = get_the_terms( $post_id, 'es_status' );
+
+	if ( ! empty( $statuses ) ) {
+		foreach ( $statuses as $status ) {
+			// Check for both "Pending" and "Sold" statuses
+			if ( $status->name === 'Pending' || $status->name === 'Sold' ) {
+				$terms[] = $status;
+			}
+		}
+	}
+
+	return $terms;
+}
+add_filter( 'es_property_badges_terms', 'es312_property_badges_terms', 10, 2 );
+
+
+// Adds a space after commas
+// Does not add a space if there is already a space
+// Does not add a space if the text is formatted like currency
+// This is necessary because the string from MLS does not have spaces after commas
+function add_spaces_after_commas_in_estatik_fields($content) {
+   if (is_singular() && in_array('single-properties', get_body_class())) {
+       $dom = new DOMDocument();
+       libxml_use_internal_errors(true); 
+       $dom->loadHTML(mb_convert_encoding($content, 'HTML-ENTITIES', 'UTF-8'), LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+       $xpath = new DOMXPath($dom);
+
+       $divs = $xpath->query("//div[contains(@class, 'es-property_section') and not(contains(@class, 'es-property_section--video'))]");
+
+       foreach ($divs as $div) {
+           $spanElements = $xpath->query(".//span[contains(@class, 'es-property-field__value') and not(ancestor::iframe) and not(ancestor::script) and not(ancestor::style) and not(parent::li[contains(@class, 'es-entity-field--area')])]", $div);
+
+           foreach ($spanElements as $span) {
+               $text = $span->textContent;
+               $currencyPattern = '/\$\d{1,3}(,\d{3})*(\.\d+)?/';
+               
+               if (!preg_match($currencyPattern, $text)) {
+                   $text = str_replace(',', ', ', $text);
+                   $text = preg_replace('/, +/', ', ', $text); // Ensure only one space after the comma.
+               }
+
+               $span->textContent = $text;
+           }
+       }
+       $content = $dom->saveHTML();
+   }
+   return $content;
+}
+add_filter('the_content', 'add_spaces_after_commas_in_estatik_fields', 9999);
+
 
 /*  BREADCRUMBS
 ________________________________________________________________________*/
@@ -655,226 +860,6 @@ function page_breadcrumbs() {
    }     
 }
 add_shortcode('breadcrumbs', 'page_breadcrumbs');
-
-/*  HIDE, EDIT WITH ELEMENTOR BUTTON(S)
-________________________________________________________________________*/
-
-function add_elementor_checkbox() {
-   // Add a new setting to the "General" WordPress settings page
-   add_settings_field(
-       'show_edit_with_elementor_button',
-       'Hide "Edit with Elementor"',
-       'render_elementor_checkbox',
-       'general'
-   );
-   
-   // Register the new setting
-   register_setting('general', 'show_edit_with_elementor_button');
-}
-
-function render_elementor_checkbox() {
-   // Retrieve the current value of the setting
-   $show_button = get_option('show_edit_with_elementor_button');
-   ?>
-   <input type="checkbox" name="show_edit_with_elementor_button" value="1" <?php checked(1, $show_button); ?>>
-   <?php
-}
-
-function hide_elementor_button() {
-   // Check if the "Show 'Edit with Elementor' button" setting is checked
-   $show_button = get_option('show_edit_with_elementor_button');
-   if ($show_button) {
-       // Hide the "Edit with Elementor" button on the post/page edit screen
-       ?>
-       <style>
-            #elementor-switch-mode-button, #elementor-editor, #wp-admin-bar-elementor_edit_page {
-                display:none;
-            } 
-      </style>
-      <?php
-   }
-}
-
-add_action('admin_init', 'add_elementor_checkbox');
-add_action('admin_head-post.php', 'hide_elementor_button');
-add_action('admin_head-post-new.php', 'hide_elementor_button');
-
-/*  RETS/MLS PLUGIN - ESTATIK
-________________________________________________________________________*/
-
-// Formats MLS phone numbers
-function convert_phone_number_format($content) {
-   if (is_singular() && in_array('single-properties', get_body_class())) {
-       // Regular expression pattern to match phone number in format "123-456-7890"
-       $pattern = '/(\d{3})-(\d{3})-(\d{4})/';
-
-       // Replacement pattern for the desired format "(123) 456-7890"
-       $replacement = '($1) $2-$3';
-
-       // Convert phone numbers to desired format
-       $content = preg_replace($pattern, $replacement, $content);
-   }
-
-   return $content;
-}
-add_filter('the_content', 'convert_phone_number_format', 9999);
-
-
-// Adds a space after commas
-// Does not add a space if there is already a space
-// Does not add a space if the text is formatted like currency
-// This is necessary because the string from MLS does not have spaces after commas
-function add_spaces_after_commas_in_estatik_fields($content) {
-   if (is_singular() && in_array('single-properties', get_body_class())) {
-       $dom = new DOMDocument();
-       libxml_use_internal_errors(true); // Suppress HTML parsing errors
-       $dom->loadHTML($content, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
-       $xpath = new DOMXPath($dom);
-
-       $divs = $xpath->query("//div[contains(@class, 'es-property_section')]");
-
-       foreach ($divs as $div) {
-           // Find span elements with class "es-property-field__value" within the div specified above
-           $spanElements = $xpath->query(".//span[contains(@class, 'es-property-field__value')]", $div);
-
-           foreach ($spanElements as $span) {
-               $text = $span->textContent;
-
-               // Regular expression pattern to match currency formatting
-               $currencyPattern = '/\$\d{1,3}(,\d{3})*(\.\d+)?/';
-
-               // Check if the text matches the currency pattern
-               if (!preg_match($currencyPattern, $text)) {
-                   $text = str_replace(', ', ',', $text);
-                   $text = str_replace(',', ', ', $text);
-               }
-
-               $span->textContent = $text;
-           }
-       }
-       $content = $dom->saveHTML();
-   }
-   return $content;
-}
-add_filter('the_content', 'add_spaces_after_commas_in_estatik_fields', 9999);
-
-
-// Adds commas to specified number strings such as sq ft and lot size
-function add_commas_to_estatik_fields($content) {
-   if (is_singular() && in_array('single-properties', get_body_class())) {
-       $pattern = '/\d{1,3}(?=(\d{3})+(?!\d))/';
-       $replacement = '$0,';
-       $dom = new DOMDocument();
-       $dom->loadHTML($content);
-       $xpath = new DOMXPath($dom);
-       
-       // Query for 'es-property-field--area'
-       $elements = $xpath->query("//li[contains(@class, 'es-property-field--area')]/span[contains(@class, 'es-property-field__value')]");
-       foreach ($elements as $element) {
-           $text = $element->nodeValue;
-           $modifiedText = preg_replace($pattern, $replacement, $text);
-           $element->nodeValue = $modifiedText;
-       }
-
-       // Query for 'es-entity-field--lot_size'
-       $elements = $xpath->query("//li[contains(@class, 'es-entity-field--lot_size')]/span[contains(@class, 'es-property-field__value')]");
-       foreach ($elements as $element) {
-           $text = $element->nodeValue;
-           $modifiedText = preg_replace($pattern, $replacement, $text);
-           $element->nodeValue = $modifiedText;
-       }
-       
-       $content = $dom->saveHTML();
-   }
-   return $content;
-}
-add_filter('the_content', 'add_commas_to_estatik_fields', 9999);
-
-
-// Adds a comma to the sq ft top meta field on single property pages
-// function add_commas_to_estatik_meta_fields($content) {
-//    if (is_singular() && in_array('single-properties', get_body_class())) {
-//        $pattern = '/\d{1,3}(?=(\d{3})+(?!\d))/';
-//        $replacement = '$0,';
-//        $dom = new DOMDocument();
-//        $dom->loadHTML($content);
-//        $xpath = new DOMXPath($dom);
-//        $elements = $xpath->query("//ul[contains(@class, 'es-listing__meta')]//li[contains(@class, 'es-listing__meta-area')]");
-//        foreach ($elements as $element) {
-//            $span = $element->getElementsByTagName('span')->item(0);
-//            $b = $span->getElementsByTagName('b')->item(0);
-//            $text = $b->nodeValue;
-//            $modifiedText = preg_replace($pattern, $replacement, $text);
-//            $b->nodeValue = $modifiedText;
-//        }
-//        $content = $dom->saveHTML();
-//    }
-//    return $content;
-// }
-// add_filter('the_content', 'add_commas_to_estatik_meta_fields', 9999);
-
-
-// Removes commas from Agent Contact name field when named "list-agent"
-// If at any point the field name changes, that class name needs updated
-function remove_commas_from_estatik_fields($content) {
-   if (is_singular() && in_array('single-properties', get_body_class())) {
-       $pattern = '/,/';
-       $replacement = ''; // Empty string to remove the comma
-       $dom = new DOMDocument();
-       $dom->loadHTML($content);
-       $xpath = new DOMXPath($dom);
-       $elements = $xpath->query("//li[contains(@class, 'es-entity-field--list-agent')]/span[contains(@class, 'es-property-field__value')]");
-       foreach ($elements as $element) {
-           $text = $element->nodeValue;
-           $modifiedText = preg_replace($pattern, $replacement, $text);
-           $element->nodeValue = $modifiedText;
-       }
-       $content = $dom->saveHTML();
-   }
-   return $content;
-}
-add_filter('the_content', 'remove_commas_from_estatik_fields', 9999);
-
-
-// Converts UPPERCASE to Title Case for the builders and community div
-function convert_to_title_case($content) {
-   if (is_singular() && in_array('single-properties', get_body_class())) {
-       $pattern = '/\b\w+\b/';
-       $dom = new DOMDocument();
-       $dom->loadHTML($content);
-       $xpath = new DOMXPath($dom);
-       $elements = $xpath->query("//li[contains(@class, 'es-entity-field--builder') or contains(@class, 'es-entity-field--subdivision')]/span[contains(@class, 'es-property-field__value')]");
-       foreach ($elements as $element) {
-           $text = $element->nodeValue;
-           $modifiedText = preg_replace_callback($pattern, function ($matches) {
-               return ucwords(strtolower($matches[0]));
-           }, $text);
-           $element->nodeValue = $modifiedText;
-       }
-       $content = $dom->saveHTML();
-   }
-   return $content;
-}
-add_filter('the_content', 'convert_to_title_case', 9999);
-
-
-// Gets the Status Terms from MLS and adds them to the listings
-// Shows the term "Pending" instead of "Active" and "Pending"
-function es312_property_badges_terms( $terms, $post_id ) {
-	$terms = empty( $terms ) ? array() : $terms;
-	$statuses = get_the_terms( $post_id, 'es_status' );
-
-	if ( ! empty( $statuses ) ) {
-		foreach ( $statuses as $status ) {
-			if ( $status->name === 'Pending' ) {
-				$terms[] = $status;
-			}
-		}
-	}
-
-	return $terms;
-}
-add_filter( 'es_property_badges_terms', 'es312_property_badges_terms', 10, 2 );
 
 
 /* THIS IS THE END                                                       */

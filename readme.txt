@@ -4,7 +4,7 @@ Contributors: Thomas Rainer
 Requires at least: 4.7
 Tested up to: 6.1
 Stable tag: 1.0
-Version: 1.3.3
+Version: 1.4.0
 Requires PHP: 8.0
 JQuery: 3.6.3
 License: GNU General Public License v3 or later
@@ -18,6 +18,17 @@ A basic, plain-vanilla, lightweight theme, best suited for building your site us
 This theme resets the WordPress environment and prepares it for smooth operation of Elementor.
 
 Screenshot's images & icons are licensed under: Creative Commons (CC0), https://creativecommons.org/publicdomain/zero/1.0/legalcode
+
+= 1.4.0 - 08-24-2023 =
+* Refactored functions for Estatik that added spaces after commas and removed spaces after commas
+* Improved DOM functions within prev mentioned functions to eliminate error related to conflicts
+
+= 1.3.5 - 08-24-2023 =
+* Sold added as a potential label for properties
+* Edits to Estatik template files, removed slideshow gallery from listings view (== 1 from => 1) - line 35
+
+= 1.3.4 - 08-22-2023 =
+* Additional styles for POH Entry Numbers
 
 = 1.3.3 - 08-22-2023 =
 * POH ACF Field for Entry numbers to Estatik template override (property/content-archive)

@@ -36,7 +36,7 @@ if ( empty( $ignore_wrapper ) ) : ?>
                             'is_full' => false,
                             'icon_size' => 'big',
                             'context' => 'property-content',
-                            'show_compare' => isset( $show_compare ) ? $show_compare : true,
+                            'show_compare' => isset( $show_compare ) ? $show_compare : false,
                         ) ); ?>
                     </div>
                     <?php es_the_price(); ?>
