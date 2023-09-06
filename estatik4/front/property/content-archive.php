@@ -11,7 +11,8 @@ if ( empty( $ignore_wrapper ) ) : ?>
         ) ); ?>
         <div class="es-listing__content">
             <div class="es-listing__content__inner">
-                <div class="es-listing__content__left">
+                
+               <div class="es-listing__content__left">
                      <?php if( get_field('poh_listing-entry-number') ): ?>
                         <div class="poh_entry-container">
                            <strong><?php the_field('poh_listing-entry-number'); ?></strong>
@@ -28,7 +29,11 @@ if ( empty( $ignore_wrapper ) ) : ?>
                     <?php endif;
                     do_action( 'es_property_meta', array( 'use_icons' => true ) );
                     es_the_address( '<div class="es-address es-listing--hide-on-list">', '</div>' ); ?>
+                     <?php if( get_field('poh_community-logo') ): ?>
+                        <div class="pohCommunity-logo"><img src="<?php the_field('poh_community-logo'); ?>" /></div>   
+                     <?php endif; ?>
                 </div>
+                
                 <div class="es-listing__content__right es-listing--hide-on-grid">
                     <div class="es-property__control es-listing--hide-on-grid">
                         <?php do_action( 'es_property_control', array(
