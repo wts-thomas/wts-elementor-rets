@@ -4,7 +4,7 @@ Contributors: Thomas Rainer
 Requires at least: 4.7
 Tested up to: 6.1
 Stable tag: 1.0
-Version: 1.5.0
+Version: 1.6.0
 Requires PHP: 8.0
 JQuery: 3.6.3
 License: GNU General Public License v3 or later
@@ -18,6 +18,10 @@ A basic, plain-vanilla, lightweight theme, best suited for building your site us
 This theme resets the WordPress environment and prepares it for smooth operation of Elementor.
 
 Screenshot's images & icons are licensed under: Creative Commons (CC0), https://creativecommons.org/publicdomain/zero/1.0/legalcode
+
+= 1.6.0 - 10-05-2023 =
+* Functionality added to show winner graphic on properties when "yes" is checked
+* POH Winner class, styles, and artwork added to single property listings and to archive listing page
 
 = 1.5.0 - 09-06-2023 =
 * Added styles and edited 'content-archive' to show Community logos on property listings

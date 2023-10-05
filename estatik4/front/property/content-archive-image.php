@@ -4,6 +4,9 @@
  * @var $wishlist_confirm bool
  */
 
+// Check if current post has the "yes" term in 'taxo_poh-winner' taxonomy
+$poh_winner_active = has_term( 'yes', 'taxo_poh-winner' ) ? ' active' : '';
+
 $images_num = ests( 'property_item_carousel_images_num' );
 $gallery = es_get_the_field( 'gallery' );
 $target_blank = ! empty( $target_blank ) ? $target_blank : '';
@@ -22,6 +25,7 @@ $carousel_config = array(
 ); ?>
 
 <div class="es-listing__image">
+   <div class="pohWinner<?php echo $poh_winner_active; ?>"></div>
     <?php do_action( 'es_property_badges' ); ?>
     <div class="es-property__control es-listing--hide-on-list">
         <?php do_action( 'es_property_control', array(
