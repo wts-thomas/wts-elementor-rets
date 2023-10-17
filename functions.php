@@ -187,6 +187,7 @@ function wts_remove_menus(){
       remove_menu_page( 'elementor' );                               //Elementor             */
       remove_menu_page( 'edit.php?post_type=elementor_library' );    //Elementor Templates   */
       remove_menu_page( 'edit.php?post_type=search-filter-widget' ); //Search & Filter       */
+      remove_menu_page( 'admin.php?page=dce-features' );             //Dynamic.ooo           */
    } 
 } 
 add_action( 'admin_menu', 'wts_remove_menus', 9999 );
