@@ -487,29 +487,13 @@ add_action('admin_head-post-new.php', 'hide_elementor_button');
 /*  RETS/MLS PLUGIN - ESTATIK
 ________________________________________________________________________*/
 
-// Formats MLS phone numbers
-function convert_phone_number_format($content) {
-   if (is_singular() && in_array('single-properties', get_body_class())) {
-       // Regular expression pattern to match phone number in format "123-456-7890"
-       $pattern = '/(\d{3})-(\d{3})-(\d{4})/';
-
-       // Replacement pattern for the desired format "(123) 456-7890"
-       $replacement = '($1) $2-$3';
-
-       // Convert phone numbers to desired format
-       $content = preg_replace($pattern, $replacement, $content);
-   }
-
-   return $content;
-}
-add_filter('the_content', 'convert_phone_number_format', 9999);
-
-
 libxml_use_internal_errors(true); // Suppress HTML parsing warnings globally for the following functions
 
 function load_content_into_dom($content) {
     $dom = new DOMDocument();
-    $dom->loadHTML(mb_convert_encoding($content, 'HTML-ENTITIES', 'UTF-8'), LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+    if (!empty(trim($content))) {
+        $dom->loadHTML(mb_convert_encoding($content, 'HTML-ENTITIES', 'UTF-8'), LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+    }
     return $dom;
 }
 
@@ -639,6 +623,24 @@ function add_spaces_after_commas_in_estatik_fields($content) {
    return $content;
 }
 add_filter('the_content', 'add_spaces_after_commas_in_estatik_fields', 9999);
+
+
+// Formats MLS phone numbers
+function convert_phone_number_format($content) {
+   if (is_singular() && in_array('single-properties', get_body_class())) {
+       // Regular expression pattern to match phone number in format "123-456-7890"
+       $pattern = '/(\d{3})-(\d{3})-(\d{4})/';
+
+       // Replacement pattern for the desired format "(123) 456-7890"
+       $replacement = '($1) $2-$3';
+
+       // Convert phone numbers to desired format
+       $content = preg_replace($pattern, $replacement, $content);
+   }
+
+   return $content;
+}
+add_filter('the_content', 'convert_phone_number_format', 9999);
 
 
 /*  BREADCRUMBS
