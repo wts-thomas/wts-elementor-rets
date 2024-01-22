@@ -11,7 +11,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<title><?php wp_title(); ?></title>
 	<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" name="viewport" />
 	<link rel="profile" href="https://gmpg.org/xfn/11">
-	
 	<?php wp_head(); ?>
 </head>
 

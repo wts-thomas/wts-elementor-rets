@@ -21,6 +21,11 @@ add_action('admin_head', 'my_admin_head');
 // Adds the Excerpt meta box for pages.
 add_post_type_support( 'page', 'excerpt' );
 
+// Adds Title support for pages
+function title_theme_slug_setup() {
+   add_theme_support( 'title-tag' );
+}
+add_action( 'after_setup_theme', 'title_theme_slug_setup' );
 
 /*  Performance & Security Edits
 _____________________________________________________________________*/
